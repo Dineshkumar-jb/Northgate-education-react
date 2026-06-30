@@ -20,9 +20,13 @@ const ContactForm = () => {
   const [brochureStatus, setBrochureStatus] = useState('idle'); // idle, preparing, sent
 
   useEffect(() => {
-    // Initialize EmailJS with the public key from env
-    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '3aWC1kw6lFXVlPsDX';
-    emailjs.init(publicKey);
+    // Initialize EmailJS with the public key from environment variable
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+    if (publicKey) {
+      emailjs.init(publicKey);
+    } else {
+      console.warn('EmailJS public key not configured. Set VITE_EMAILJS_PUBLIC_KEY in .env');
+    }
   }, []);
 
   const handleChange = (e) => {
@@ -71,8 +75,9 @@ const ContactForm = () => {
 
     // 1. Send via EmailJS
     try {
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_b7t74un';
-      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_po9n4ea';
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+      if (!serviceId || !templateId) throw new Error('EmailJS env vars not set');
       await emailjs.send(serviceId, templateId, templateParams);
       emailSucceeded = true;
     } catch (err) {
